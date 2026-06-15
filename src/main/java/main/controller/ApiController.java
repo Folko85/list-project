@@ -1,5 +1,6 @@
 package main.controller;
 
+import jakarta.validation.Valid;
 import main.dto.TaskModel;
 import main.mapper.TaskMapper;
 import main.repository.UserRepository;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;

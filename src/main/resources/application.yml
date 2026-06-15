@@ -5,7 +5,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    database-platform: main.config.sqlite.SQLiteDialect
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
   liquibase:
     change-log: classpath:db/changelog/changelog.yml
 server:
