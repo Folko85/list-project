@@ -1,5 +1,6 @@
 package main.model.enums;
 
+import lombok.Getter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Set;
@@ -7,6 +8,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Set.of;
 
+@Getter
 public enum Role {
     USER(of(Permission.USER)),
     MODERATOR(of(Permission.USER, Permission.MODERATE)),
@@ -15,10 +17,6 @@ public enum Role {
 
     Role(Set<Permission> permissions) {
         this.permissions = permissions;
-    }
-
-    public Set<Permission> getPermissions() {
-        return permissions;
     }
 
     public Set<SimpleGrantedAuthority> getAuthorities() {

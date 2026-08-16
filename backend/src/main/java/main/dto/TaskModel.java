@@ -14,17 +14,9 @@ public class TaskModel {
     @NotBlank
     private String title;
 
-    public Integer getId() {
-        return id;
-    }
-
     public TaskModel setId(Integer id) {
         this.id = id;
         return this;
-    }
-
-    public String getTitle() {
-        return title;
     }
 
     public TaskModel setTitle(String title) {  //это (возвращение себя) для красивой записи в маппере

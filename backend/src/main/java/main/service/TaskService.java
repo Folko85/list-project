@@ -56,7 +56,7 @@ public class TaskService {
         User user = userRepository.findByUsernameAndPassword(userDetail.getUsername(), userDetail.getPassword());
         List<Task> tasks = taskRepository.findAll().stream()
                 .filter(t -> t.getUser().getId().equals(user.getId()))
-                .collect(Collectors.toList());
+                .toList();
         if (tasks.isEmpty()) {
             throw new EntityNotFoundException("Tasks is not exist");
         } else {
