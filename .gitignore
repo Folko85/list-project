@@ -1,4 +1,2 @@
-/ToDoList.iml
-/target/
 /.idea/
-/todo.db
+/backend/target/

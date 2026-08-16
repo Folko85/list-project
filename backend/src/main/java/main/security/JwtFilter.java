@@ -2,7 +2,7 @@ package main.security;
 
 import java.io.IOException;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,10 +36,8 @@ public class JwtFilter extends GenericFilterBean {
         if (token != null && jwtProvider.validateToken(token)) {
             String userLogin = jwtProvider.getLoginFromToken(token);
             UserDetails userDetails = userDetailService.loadUserByUsername(userLogin);
-            if (userDetails != null) {
-                SecurityContextHolder.getContext()
-                        .setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
-            }
+            SecurityContextHolder.getContext()
+                    .setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }
@@ -47,7 +45,7 @@ public class JwtFilter extends GenericFilterBean {
     private String getTokenFromRequest(HttpServletRequest request) {
         String token = request.getHeader(AUTHORIZATION_KEY);
         if (hasText(token)) {
-            return StringUtils.removeStart(token, "Bearer").trim();
+            return Strings.CS.removeStart(token, "Bearer").trim();
         }
         return null;
     }
