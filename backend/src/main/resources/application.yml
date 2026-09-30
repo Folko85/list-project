@@ -10,11 +10,6 @@ spring:
     change-log: classpath:db/changelog/changelog.yml
 server:
   port : 5000
-bot:
-  botUserName: OtherToDoBot
-  notToken: 1446227679:AAH2Dh0LN928g2R31aEkzKBg3po4Zd8KMPM
-  webHookPath: https://b419f8dd.ngrok.io
-
 jasypt:
   encryptor:
     bean: encryptorBean
