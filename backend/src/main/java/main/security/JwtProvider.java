@@ -24,13 +24,13 @@ public class JwtProvider {
         return Jwts.builder()
                 .setSubject(login)
                 .setExpiration(date)
-                .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
+                .signWith(SignatureAlgorithm.HS256, JWT_SECRET.repeat(5))
                 .compact();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token);
+            Jwts.parser().setSigningKey(JWT_SECRET.repeat(5)).parseClaimsJws(token);
             return true;
         } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException expEx) {
             return false;
@@ -38,7 +38,7 @@ public class JwtProvider {
     }
 
     public String getLoginFromToken(String token) {
-        Claims claims = Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parser().setSigningKey(JWT_SECRET.repeat(5)).parseClaimsJws(token).getBody();
         return claims.getSubject();
     }
 
