@@ -6,15 +6,10 @@ import main.model.Task;
 import main.model.User;
 import main.repository.TaskRepository;
 import main.repository.UserRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -29,39 +24,46 @@ public class TaskService {
         this.userRepository = userRepository;
     }
 
-    public Task findById(Integer id) {
-        return taskRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Task is not exist"));
+    public Task findById(Integer id, String username) {
+        User user = findUser(username);
+        return taskRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Task is not exist"));
     }
 
-    public List<Task> findAll(Principal principal) {
-        User user = userRepository.findByUsername(principal.getName()).orElseThrow(() -> new UsernameNotFoundException("Нет такого пользователя"));
-        return taskRepository.findAll().stream().filter(task -> task.getUser() != null)
-                .filter(t -> t.getUser().getId().equals(user.getId()))
-                .collect(Collectors.toList());
+    public List<Task> findAll(String username) {
+        User user = findUser(username);
+        return taskRepository.findAllByUserId(user.getId());
     }
 
-    public Task save(Task task) {
+    public Task create(String title, String username) {
+        User user = findUser(username);
+        return taskRepository.save(new Task().setTitle(title).setUser(user));
+    }
+
+    public Task update(Integer id, String title, String username) {
+        if (id == null) {
+            throw new EntityNotFoundException("Task is not exist");
+        }
+        Task task = findById(id, username);
+        task.setTitle(title);
         return taskRepository.save(task);
     }
 
-    public void deleteById(Integer id) {
-        if (taskRepository.findById(id).isEmpty()) {
-            throw new EntityNotFoundException("Task is not exist");
-        } else taskRepository.deleteById(id);
+    public void deleteById(Integer id, String username) {
+        taskRepository.delete(findById(id, username));
     }
 
-    public void deleteAll() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetail = (UserDetails) auth.getPrincipal();
-        User user = userRepository.findByUsernameAndPassword(userDetail.getUsername(), userDetail.getPassword());
-        List<Task> tasks = taskRepository.findAll().stream()
-                .filter(t -> t.getUser().getId().equals(user.getId()))
-                .toList();
+    public void deleteAll(String username) {
+        User user = findUser(username);
+        List<Task> tasks = taskRepository.findAllByUserId(user.getId());
         if (tasks.isEmpty()) {
             throw new EntityNotFoundException("Tasks is not exist");
-        } else {
-            tasks.forEach(task -> taskRepository.deleteById(task.getId()));
         }
+        taskRepository.deleteAll(tasks);
+    }
 
+    private User findUser(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Нет такого пользователя"));
     }
 }

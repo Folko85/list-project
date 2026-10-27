@@ -11,7 +11,7 @@ public class TaskModel {
 
     private Integer id;
 
-    @NotBlank
+    @NotBlank(message = "Field cannot being empty")
     private String title;
 
     public TaskModel setId(Integer id) {

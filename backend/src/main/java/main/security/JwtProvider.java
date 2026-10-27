@@ -1,12 +1,13 @@
 package main.security;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -17,9 +18,15 @@ import java.util.Date;
 @Component
 public class JwtProvider {
 
+    private final Key key;
 
-    private final String JWT_SECRET = "jwtSecret"; // пока так
-    private final Key key = Keys.hmacShaKeyFor(JWT_SECRET.repeat(5).getBytes());
+    public JwtProvider(@Value("${security.jwt.secret}") String jwtSecret) {
+        byte[] secretBytes = Decoders.BASE64.decode(jwtSecret);
+        if (secretBytes.length < 32) {
+            throw new IllegalArgumentException("JWT secret must decode to at least 32 bytes");
+        }
+        this.key = Keys.hmacShaKeyFor(secretBytes);
+    }
 
     public String generateToken(String login) {
         Date date = Date.from(LocalDate.now().plusDays(15).atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -40,9 +47,7 @@ public class JwtProvider {
     }
 
     public String getLoginFromToken(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
-        return claims.getSubject();
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
     }
 
 }
-

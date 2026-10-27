@@ -1,9 +1,9 @@
 package main.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import main.dto.TaskModel;
 import main.mapper.TaskMapper;
-import main.repository.UserRepository;
 import main.service.TaskService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,50 +19,44 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 public class ApiController {
 
     private final TaskService service;
 
-    private final UserRepository userRepository;
-
-    public ApiController(TaskService service, UserRepository userRepository) {
-        this.service = service;
-        this.userRepository = userRepository;
-    }
-
     @GetMapping("/api/tasks")
     @PreAuthorize("hasAuthority('user:write')")
     public List<TaskModel> getTasks(Principal principal) {
-        return service.findAll(principal).stream().map(TaskMapper::map).collect(Collectors.toList());
+        return service.findAll(principal.getName()).stream().map(TaskMapper::map).collect(Collectors.toList());
     }
 
     @GetMapping("/api/tasks/{id}")
     @PreAuthorize("hasAuthority('user:write')")
-    public TaskModel getTaskById(@PathVariable Integer id) {
-        return TaskMapper.map(service.findById(id));
+    public TaskModel getTaskById(@PathVariable Integer id, Principal principal) {
+        return TaskMapper.map(service.findById(id, principal.getName()));
     }
 
     @PostMapping("/api/tasks")
     @PreAuthorize("hasAuthority('user:write')")
-    public TaskModel addTask(@Valid @RequestBody TaskModel task) {
-        return TaskMapper.map(service.save(TaskMapper.reverseMap(task, userRepository)));
+    public TaskModel addTask(@Valid @RequestBody TaskModel task, Principal principal) {
+        return TaskMapper.map(service.create(task.getTitle(), principal.getName()));
     }
 
     @PutMapping("/api/tasks")
     @PreAuthorize("hasAuthority('user:write')")
-    public TaskModel editTask(@Valid @RequestBody TaskModel task) {
-        return TaskMapper.map(service.save(TaskMapper.reverseMap(task, userRepository)));
+    public TaskModel editTask(@Valid @RequestBody TaskModel task, Principal principal) {
+        return TaskMapper.map(service.update(task.getId(), task.getTitle(), principal.getName()));
     }
 
     @DeleteMapping("/api/tasks/{id}")
     @PreAuthorize("hasAuthority('user:write')")
-    public void deleteTaskById(@PathVariable Integer id) {
-        service.deleteById(id);
+    public void deleteTaskById(@PathVariable Integer id, Principal principal) {
+        service.deleteById(id, principal.getName());
     }
 
     @DeleteMapping("/api/tasks")
     @PreAuthorize("hasAuthority('user:write')")
-    public void deleteTasks() {
-        service.deleteAll();
+    public void deleteTasks(Principal principal) {
+        service.deleteAll(principal.getName());
     }
 }
