@@ -1,23 +1,26 @@
 server:
   port : 5000
 
+security:
+  jwt:
+    secret: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+
 spring:
   main:
     allow-bean-definition-overriding: true
     banner-mode: 'off'
   jmx.default-domain: test
-  datasource: # настройки источника данных (базы)
-    username: user # логин для подключения к базе
-    password: password # пароль для подключения к базе
-    driverClassName: org.h2.Driver #драйвер для подключения к базе
-    jdbc-url: jdbc:h2:mem:mydb1 #url для подключения к базе
+  datasource:
+    username: user
+    password: password
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:mydb1
   liquibase:
     change-log: /db/changelog/changelog.yml
     enabled: false
   jpa:
     show-sql: false
     hibernate:
-      dialect: org.h2.Driver
       ddl-auto: update
 
 jasypt:

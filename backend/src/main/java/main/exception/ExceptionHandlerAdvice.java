@@ -2,9 +2,12 @@ package main.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import main.dto.response.ErrorResponse;
+
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -20,6 +23,20 @@ class ExceptionHandlerAdvice {
                 .setErrorDescription(exc.getMessage());
         log.warn(Arrays.toString(exc.getStackTrace()));
         return new ResponseEntity<>(badResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException exc) {
+        return new ResponseEntity<>(exc.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleInvalidRequest(MethodArgumentNotValidException exc) {
+        String message = exc.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .orElse("Invalid request");
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UserExistException.class)

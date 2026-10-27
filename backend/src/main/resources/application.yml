@@ -4,12 +4,15 @@ spring:
     url: jdbc:sqlite:todo.db
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
     database-platform: org.hibernate.community.dialect.SQLiteDialect
   liquibase:
     change-log: classpath:db/changelog/changelog.yml
 server:
   port : 5000
+security:
+  jwt:
+    secret: ${JWT_SECRET}
 jasypt:
   encryptor:
     bean: encryptorBean

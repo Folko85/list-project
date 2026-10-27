@@ -12,12 +12,15 @@ import main.exception.IncorrectNiknameException;
 import main.exception.UserExistException;
 import main.service.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.security.Principal;
 
 @Slf4j
 @AllArgsConstructor
@@ -39,7 +42,10 @@ public class UserController {
 
     @GetMapping("/{username}")
     @PreAuthorize("hasAuthority('user:write')")
-    public ProfileResponse getProfile(@PathVariable String username) {
+    public ProfileResponse getProfile(@PathVariable String username, Principal principal) {
+        if (!username.equals(principal.getName())) {
+            throw new AccessDeniedException("You can only view your own profile");
+        }
         return userService.getProfile(username);
     }
 

@@ -1,16 +1,14 @@
 package main.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 public abstract class AbstractTest {
     /** Web application context. */
@@ -21,17 +19,16 @@ public abstract class AbstractTest {
     protected MockMvc mockMvc;
 
     /** Object mapper. */
-    @Autowired
-    protected ObjectMapper mapper; // это нам пригодится в следующем ДЗ для проверки более сложного API
+    protected final ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Create mock mvc.
      */
-    @Before
+    @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(ctx)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
     }
 }
-
