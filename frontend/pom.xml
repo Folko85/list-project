@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.skillbox</groupId>
+        <artifactId>list-project</artifactId>
+        <version>2.0.0</version>
+    </parent>
+
+    <artifactId>frontend</artifactId>
+    <packaging>pom</packaging>
+    <description>Flutter Web application</description>
+
+    <properties>
+        <flutter.sdk>/home/folko85/flutter</flutter.sdk>
+        <flutter.web.output.directory>${project.build.directory}/web</flutter.web.output.directory>
+    </properties>
+
+    <build>
+        <plugins>
+            <!-- Получить зависимости Flutter -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <!-- flutter pub get на этапе generate-resources -->
+                    <execution>
+                        <id>flutter pub get</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${flutter.sdk}/bin/flutter</executable>
+                            <arguments>
+                                <argument>pub</argument>
+                                <argument>get</argument>
+                            </arguments>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                        </configuration>
+                    </execution>
+                    <!-- Сборка веб-версии на этапе package -->
+                    <execution>
+                        <id>flutter build web</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${flutter.sdk}/bin/flutter</executable>
+                            <arguments>
+                                <argument>build</argument>
+                                <argument>web</argument>
+                                <argument>--output</argument>
+                                <argument>${flutter.web.output.directory}</argument>
+                            </arguments>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
